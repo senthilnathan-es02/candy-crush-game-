@@ -8,7 +8,7 @@ import './styles/app.scss';
 import './styles/board.scss';
 
 function App() {
-  const { gameState, handleCandyClick, levelUp, restartGame } = useGameLogic();
+  const { gameState, handleCandyClick, levelUp, restartGame, isSwapping } = useGameLogic();
 
   return (
     <div className="app">
@@ -18,6 +18,7 @@ function App() {
         board={gameState.board}
         selectedCandy={gameState.selectedCandy}
         onCandyClick={handleCandyClick}
+        isSwapping={isSwapping}
       />
       
       {gameState.gameStatus === 'gameOver' && (

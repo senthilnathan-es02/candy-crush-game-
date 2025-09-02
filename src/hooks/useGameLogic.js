@@ -16,97 +16,82 @@ export const useGameLogic = () => {
     selectedCandy: null,
   }));
 
-  const swapCandies = useCallback((row1, col1, row2, col2) => {
-    setGameState(prevState => {
-      const newBoard = prevState.board.map(row => [...row]);
-      
-      // Swap candies
-      const temp = newBoard[row1][col1];
-      newBoard[row1][col1] = newBoard[row2][col2];
-      newBoard[row2][col2] = temp;
-      
-      // Update positions
-      newBoard[row1][col1].row = row1;
-      newBoard[row1][col1].col = col1;
-      newBoard[row2][col2].row = row2;
-      newBoard[row2][col2].col = col2;
-      
-      return {
-        ...prevState,
-        board: newBoard,
-        movesLeft: prevState.movesLeft - 1,
-        selectedCandy: null,
-      };
-    });
-  }, []);
+  // ✅ helper: swap candies in a board copy
+  const swapOnBoard = (board, r1, c1, r2, c2) => {
+    const newBoard = board.map(row => [...row]);
+    const temp = newBoard[r1][c1];
+    newBoard[r1][c1] = newBoard[r2][c2];
+    newBoard[r2][c2] = temp;
+    return newBoard;
+  };
 
   const handleCandyClick = useCallback((row, col) => {
     setGameState(prevState => {
       if (prevState.gameStatus !== 'playing') return prevState;
 
-      const { selectedCandy } = prevState;
-      
+      const { selectedCandy, board, movesLeft } = prevState;
+
+      // First click → select candy
       if (!selectedCandy) {
-        // Select the candy
-        return {
-          ...prevState,
-          selectedCandy: { row, col },
-        };
+        return { ...prevState, selectedCandy: { row, col } };
       }
-      
+
+      // Clicking same candy → deselect
       if (selectedCandy.row === row && selectedCandy.col === col) {
-        // Deselect the same candy
-        return {
-          ...prevState,
-          selectedCandy: null,
-        };
+        return { ...prevState, selectedCandy: null };
       }
-      
-      // Try to swap
-      if (canSwap(prevState.board, selectedCandy.row, selectedCandy.col, row, col)) {
-        swapCandies(selectedCandy.row, selectedCandy.col, row, col);
-        return prevState;
+
+      // Check if swap is valid (adjacent)
+      if (canSwap(board, selectedCandy.row, selectedCandy.col, row, col)) {
+        // Try swap temporarily
+        const swappedBoard = swapOnBoard(board, selectedCandy.row, selectedCandy.col, row, col);
+
+        // Check if swap creates matches
+        const matches = findMatches(swappedBoard);
+        if (matches.length > 0) {
+          // ✅ Valid swap → accept & reduce moves
+          return {
+            ...prevState,
+            board: swappedBoard,
+            movesLeft: movesLeft - 1,
+            selectedCandy: null,
+          };
+        } else {
+          // ❌ Invalid swap → reject, keep moves same
+          return { ...prevState, selectedCandy: null };
+        }
       }
-      
-      // Select new candy if swap is not valid
-      return {
-        ...prevState,
-        selectedCandy: { row, col },
-      };
+
+      // Not adjacent → change selection
+      return { ...prevState, selectedCandy: { row, col } };
     });
-  }, [swapCandies]);
+  }, []);
 
   const processMatches = useCallback(() => {
     setGameState(prevState => {
       let newBoard = [...prevState.board.map(row => [...row])];
       let totalScore = prevState.score;
       let hasMatches = true;
-      
+
       while (hasMatches) {
         const matches = findMatches(newBoard);
-        
+
         if (matches.length === 0) {
           hasMatches = false;
           break;
         }
-        
-        // Calculate score
+
+        // Add score
         matches.forEach(match => {
           totalScore += match.candies.length * 10;
         });
-        
-        // Remove matches
+
+        // Remove & refill
         newBoard = removeMatches(newBoard, matches);
-        
-        // Refill board
         newBoard = refillBoard(newBoard);
       }
-      
-      return {
-        ...prevState,
-        board: newBoard,
-        score: totalScore,
-      };
+
+      return { ...prevState, board: newBoard, score: totalScore };
     });
   }, []);
 
@@ -132,38 +117,26 @@ export const useGameLogic = () => {
     });
   }, []);
 
-  // Check for matches after board updates
+  // Process matches automatically
   useEffect(() => {
     if (gameState.gameStatus === 'playing') {
       const timer = setTimeout(() => {
         processMatches();
       }, 100);
-      
       return () => clearTimeout(timer);
     }
   }, [gameState.board, processMatches, gameState.gameStatus]);
 
-  // Check game state
+  // Check win/lose state
   useEffect(() => {
     if (gameState.gameStatus === 'playing') {
       if (gameState.score >= gameState.targetScore) {
-        setGameState(prevState => ({
-          ...prevState,
-          gameStatus: 'levelUp',
-        }));
+        setGameState(prevState => ({ ...prevState, gameStatus: 'levelUp' }));
       } else if (gameState.movesLeft <= 0) {
-        setGameState(prevState => ({
-          ...prevState,
-          gameStatus: 'gameOver',
-        }));
+        setGameState(prevState => ({ ...prevState, gameStatus: 'gameOver' }));
       }
     }
   }, [gameState.score, gameState.targetScore, gameState.movesLeft, gameState.gameStatus]);
 
-  return {
-    gameState,
-    handleCandyClick,
-    levelUp,
-    restartGame,
-  };
+  return { gameState, handleCandyClick, levelUp, restartGame };
 };

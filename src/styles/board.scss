@@ -4,95 +4,82 @@
   grid-template-columns: repeat(8, 1fr);
   grid-template-rows: repeat(8, 1fr);
   gap: 4px;
-  background: rgba(255, 255, 255, 0.1);
-  padding: 16px;
-  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(10px);
-  border: 2px solid rgba(255, 255, 255, 0.2);
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
-  width: 100%;
-  max-width: 480px;
+  border-radius: 20px;
+  padding: 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+
+  // Flexible size
+  width: 90vw;
+  height: 90vw;
+  max-width: 450px;
+  max-height: 450px;
   aspect-ratio: 1;
+  margin: 0 auto; // center in mobile
 }
 
 .candy-cell {
-  background: linear-gradient(145deg, #ffffff, #f0f0f0);
+  background: linear-gradient(135deg, #f8f9fa, #e9ecef);
   border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: all 0.2s ease;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 2px solid transparent;
   position: relative;
   overflow: hidden;
 
-  &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
-  }
 
-  &.selected {
-    background: linear-gradient(145deg, #fff3cd, #ffeaa7);
-    border: 3px solid #fdcb6e;
-    transform: scale(1.05);
-    box-shadow: 0 8px 25px rgba(253, 203, 110, 0.4);
-    animation: selectedPulse 0.8s ease infinite alternate;
-  }
-
-  &.empty {
-    background: transparent;
-    cursor: default;
-    
-    &:hover {
-      transform: none;
-      box-shadow: none;
-    }
-  }
-
-  &.animating {
-    animation: candyPop 0.3s ease;
-  }
 
   .candy-emoji {
-    font-size: 2rem;
+    font-size: clamp(1.2rem, 2vw, 1.8rem); // auto resize based on screen
     user-select: none;
-    transition: transform 0.2s ease;
-    
-    .candy-cell:hover & {
-      transform: scale(1.1);
-    }
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
   }
+}
 
-  // Candy entrance animation
-  &:not(.empty) {
-    animation: candyDrop 0.5s ease forwards;
-  }
+// Emoji-based hover effects
+.candy-cell:hover:has(.candy-emoji:contains("🍎")) {
+  background: linear-gradient(135deg, #ff6b6b, #ee5a52);
+}
+.candy-cell:hover:has(.candy-emoji:contains("🍊")) {
+  background: linear-gradient(135deg, #ffa726, #ff9800);
+}
+.candy-cell:hover:has(.candy-emoji:contains("🍋")) {
+  background: linear-gradient(135deg, #ffeb3b, #fdd835);
+}
+.candy-cell:hover:has(.candy-emoji:contains("🍇")) {
+  background: linear-gradient(135deg, #9c27b0, #8e24aa);
+}
+.candy-cell:hover:has(.candy-emoji:contains("🍓")) {
+  background: linear-gradient(135deg, #e91e63, #c2185b);
+}
+.candy-cell:hover:has(.candy-emoji:contains("🍒")) {
+  background: linear-gradient(135deg, #f44336, #d32f2f);
 }
 
 // Animations
 @keyframes selectedPulse {
-  0% { box-shadow: 0 8px 25px rgba(253, 203, 110, 0.4); }
-  100% { box-shadow: 0 8px 25px rgba(253, 203, 110, 0.7); }
-}
-
-@keyframes candyPop {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.2); }
-  100% { transform: scale(1); }
-}
-
-@keyframes candyDrop {
   0% {
-    opacity: 0;
-    transform: translateY(-100px) scale(0.5);
-  }
-  60% {
-    transform: translateY(10px) scale(1.1);
+    box-shadow: 0 0 20px rgba(102, 126, 234, 0.5);
   }
   100% {
-    opacity: 1;
-    transform: translateY(0) scale(1);
+    box-shadow: 0 0 30px rgba(102, 126, 234, 0.8);
+  }
+}
+
+@keyframes swapAnimation {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.2) rotate(10deg);
+  }
+  100% {
+    transform: scale(1);
   }
 }
 
@@ -102,6 +89,7 @@
     transform: scale(1);
   }
   50% {
+    opacity: 0.5;
     transform: scale(1.3);
   }
   100% {
@@ -110,35 +98,33 @@
   }
 }
 
-// Responsive Design for Board
+@keyframes candyFall {
+  0% {
+    transform: translateY(-100px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+// Responsive Design
 @media (max-width: 768px) {
   .game-board {
-    max-width: 350px;
     padding: 12px;
     gap: 3px;
-  }
-
-  .candy-cell {
-    border-radius: 8px;
-
-    .candy-emoji {
-      font-size: 1.5rem;
-    }
+    max-width: 380px;
+    max-height: 380px;
   }
 }
 
 @media (max-width: 480px) {
   .game-board {
-    max-width: 300px;
-    padding: 8px;
-    gap: 2px;
-  }
-
-  .candy-cell {
-    border-radius: 6px;
-
-    .candy-emoji {
-      font-size: 1.2rem;
-    }
+    padding: 10px;
+    gap: 5px;
+    max-width: 450px;
+    max-height: 450px;
+    margin-top: 60px;
   }
 }

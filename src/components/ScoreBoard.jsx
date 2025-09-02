@@ -7,7 +7,7 @@ const ScoreBoard = ({ gameState }) => {
   return (
     <div className="scoreboard">
       <div className="scoreboard-header">
-        <h1 className="game-title">Candy Crush</h1>
+        <h1 className="game-title">Candy Puzzle</h1>
         <div className="level-badge">Level {level}</div>
       </div>
       

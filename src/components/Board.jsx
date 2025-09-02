@@ -1,7 +1,7 @@
 import React from 'react';
 import Candy from './Candy';
 
-const Board = ({ board, selectedCandy, onCandyClick }) => {
+const Board = ({ board, selectedCandy, onCandyClick, isSwapping }) => {
   return (
     <div className="game-board">
       {board.map((row, rowIndex) =>
@@ -13,6 +13,7 @@ const Board = ({ board, selectedCandy, onCandyClick }) => {
               selectedCandy?.row === rowIndex && selectedCandy?.col === colIndex
             }
             onClick={() => onCandyClick(rowIndex, colIndex)}
+            isAnimating={isSwapping}
           />
         ))
       )}

@@ -81,23 +81,27 @@ export const canSwap = (board, row1, col1, row2, col2) => {
   const rowDiff = Math.abs(row1 - row2);
   const colDiff = Math.abs(col1 - col2);
   
-  if ((rowDiff === 1 && colDiff === 0) || (rowDiff === 0 && colDiff === 1)) {
-    // Simulate the swap
-    const tempBoard = board.map(row => [...row]);
-    const temp = tempBoard[row1][col1];
-    tempBoard[row1][col1] = tempBoard[row2][col2];
-    tempBoard[row2][col2] = temp;
-    
-    // Update positions
+  return (rowDiff === 1 && colDiff === 0) || (rowDiff === 0 && colDiff === 1);
+};
+
+export const wouldCreateMatch = (board, row1, col1, row2, col2) => {
+  // Simulate the swap
+  const tempBoard = board.map(row => [...row]);
+  const temp = tempBoard[row1][col1];
+  tempBoard[row1][col1] = tempBoard[row2][col2];
+  tempBoard[row2][col2] = temp;
+  
+  // Update positions
+  if (tempBoard[row1][col1]) {
     tempBoard[row1][col1].row = row1;
     tempBoard[row1][col1].col = col1;
+  }
+  if (tempBoard[row2][col2]) {
     tempBoard[row2][col2].row = row2;
     tempBoard[row2][col2].col = col2;
-    
-    // Check if this creates any matches
-    const matches = findMatches(tempBoard);
-    return matches.length > 0;
   }
   
-  return false;
+  // Check if this creates any matches
+  const matches = findMatches(tempBoard);
+  return matches.length > 0;
 };

@@ -1,11 +1,10 @@
 import React, { useEffect } from 'react';
 
-
 const LevelUp = ({ level, onContinue }) => {
   useEffect(() => {
     const timer = setTimeout(() => {
       onContinue();
-    }, 3000);
+    }, 6000); // changed from 3000ms → 6000ms (6 seconds)
 
     return () => clearTimeout(timer);
   }, [onContinue]);
@@ -13,9 +12,7 @@ const LevelUp = ({ level, onContinue }) => {
   return (
     <div className="modal-overlay">
       <div className="modal-content level-up">
-        <div className="level-up-icon">
-🏆
-        </div>
+        <div className="level-up-icon">🏆</div>
         <h2>Level Up!</h2>
         <div className="level-display">
           <span className="level-text">Level {level}</span>
