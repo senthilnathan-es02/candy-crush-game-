@@ -1,0 +1,32 @@
+.app {
+  text-align: center;
+  padding: 20px;
+  h1 {
+    margin-bottom: 20px;
+  }
+}
+.scoreboard {
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: space-around;
+}
+.gameover {
+  text-align: center;
+  h1 {
+    color: red;
+  }
+}
+.levelup {
+  position: fixed;
+  top: 40%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(255, 255, 200, 0.95);
+  padding: 20px;
+  border-radius: 10px;
+  animation: fadeIn 1s ease-in-out;
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
