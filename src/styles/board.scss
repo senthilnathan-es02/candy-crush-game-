@@ -1,24 +1,144 @@
-.board {
+// Game Board Styles
+.game-board {
   display: grid;
-  grid-template-columns: repeat(8, 50px);
-  grid-template-rows: repeat(8, 50px);
+  grid-template-columns: repeat(8, 1fr);
+  grid-template-rows: repeat(8, 1fr);
   gap: 4px;
-  justify-content: center;
-  margin: 0 auto;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 16px;
+  border-radius: 20px;
+  backdrop-filter: blur(10px);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
+  width: 100%;
+  max-width: 480px;
+  aspect-ratio: 1;
 }
-.candy {
-  width: 50px;
-  height: 50px;
-  background: #eee;
-  font-size: 30px;
+
+.candy-cell {
+  background: linear-gradient(145deg, #ffffff, #f0f0f0);
+  border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
-  cursor: grab;
-  border-radius: 8px;
-  transition: transform 0.3s ease;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  position: relative;
+  overflow: hidden;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+  }
+
+  &.selected {
+    background: linear-gradient(145deg, #fff3cd, #ffeaa7);
+    border: 3px solid #fdcb6e;
+    transform: scale(1.05);
+    box-shadow: 0 8px 25px rgba(253, 203, 110, 0.4);
+    animation: selectedPulse 0.8s ease infinite alternate;
+  }
+
+  &.empty {
+    background: transparent;
+    cursor: default;
+    
+    &:hover {
+      transform: none;
+      box-shadow: none;
+    }
+  }
+
+  &.animating {
+    animation: candyPop 0.3s ease;
+  }
+
+  .candy-emoji {
+    font-size: 2rem;
+    user-select: none;
+    transition: transform 0.2s ease;
+    
+    .candy-cell:hover & {
+      transform: scale(1.1);
+    }
+  }
+
+  // Candy entrance animation
+  &:not(.empty) {
+    animation: candyDrop 0.5s ease forwards;
+  }
 }
-.candy:active {
-  cursor: grabbing;
-  transform: scale(1.1);
+
+// Animations
+@keyframes selectedPulse {
+  0% { box-shadow: 0 8px 25px rgba(253, 203, 110, 0.4); }
+  100% { box-shadow: 0 8px 25px rgba(253, 203, 110, 0.7); }
+}
+
+@keyframes candyPop {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.2); }
+  100% { transform: scale(1); }
+}
+
+@keyframes candyDrop {
+  0% {
+    opacity: 0;
+    transform: translateY(-100px) scale(0.5);
+  }
+  60% {
+    transform: translateY(10px) scale(1.1);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes matchDisappear {
+  0% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.3);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0);
+  }
+}
+
+// Responsive Design for Board
+@media (max-width: 768px) {
+  .game-board {
+    max-width: 350px;
+    padding: 12px;
+    gap: 3px;
+  }
+
+  .candy-cell {
+    border-radius: 8px;
+
+    .candy-emoji {
+      font-size: 1.5rem;
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .game-board {
+    max-width: 300px;
+    padding: 8px;
+    gap: 2px;
+  }
+
+  .candy-cell {
+    border-radius: 6px;
+
+    .candy-emoji {
+      font-size: 1.2rem;
+    }
+  }
 }

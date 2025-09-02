@@ -1,16 +1,16 @@
-import React from "react";
-import "../styles/board.scss";
+import React from 'react';
 
-const Candy = ({ candy, index, onDragStart, onDrop, onDragOver }) => {
+const Candy = ({ candy, isSelected, onClick, isAnimating = false }) => {
+  if (!candy) {
+    return <div className="candy-cell empty" />;
+  }
+
   return (
-    <div 
-      className="candy"
-      draggable={true}
-      onDragStart={(e) => onDragStart(e, index)}
-      onDrop={(e) => onDrop(e, index)}
-      onDragOver={(e) => onDragOver(e)}
+    <div
+      className={`candy-cell ${isSelected ? 'selected' : ''} ${isAnimating ? 'animating' : ''}`}
+      onClick={onClick}
     >
-      {candy}
+      <span className="candy-emoji">{candy.type}</span>
     </div>
   );
 };

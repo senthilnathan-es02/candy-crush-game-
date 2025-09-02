@@ -1,57 +1,103 @@
-import candyTypes from "./generateBoard";
-
-// Check for row/column matches of 3+
-export const checkMatches = (board, size = 8) => {
-  let newBoard = [...board];
-  let scoreGained = 0;
-
-  // Row matches
-  for (let i = 0; i < size * size; i++) {
-    const rowEnd = Math.floor(i / size) * size + (size - 3);
-    if (i % size <= size - 3) { 
-      const candy = newBoard[i];
-      if (candy && newBoard[i+1] === candy && newBoard[i+2] === candy) {
-        // Expand further match
-        let j = i;
-        while (j % size < size && newBoard[j] === candy) {
-          newBoard[j] = "";
-          j++;
-          scoreGained += 10;
+export const findMatches = (board) => {
+  const matches = [];
+  
+  // Check horizontal matches
+  for (let row = 0; row < 8; row++) {
+    let currentMatch = [];
+    let currentType = '';
+    
+    for (let col = 0; col < 8; col++) {
+      const candy = board[row][col];
+      
+      if (candy && candy.type === currentType) {
+        currentMatch.push(candy);
+      } else {
+        if (currentMatch.length >= 3) {
+          matches.push({
+            candies: [...currentMatch],
+            direction: 'horizontal',
+          });
         }
+        currentMatch = candy ? [candy] : [];
+        currentType = candy ? candy.type : '';
       }
     }
-  }
-
-  // Col matches
-  for (let i = 0; i < size*(size-2); i++) {
-    const candy = newBoard[i];
-    if (candy && newBoard[i+size] === candy && newBoard[i+2*size] === candy) {
-      let k = i;
-      while (k < size*size && newBoard[k] === candy) {
-        newBoard[k] = "";
-        k += size;
-        scoreGained += 10;
-      }
+    
+    if (currentMatch.length >= 3) {
+      matches.push({
+        candies: [...currentMatch],
+        direction: 'horizontal',
+      });
     }
   }
-
-  return { newBoard, scoreGained };
+  
+  // Check vertical matches
+  for (let col = 0; col < 8; col++) {
+    let currentMatch = [];
+    let currentType = '';
+    
+    for (let row = 0; row < 8; row++) {
+      const candy = board[row][col];
+      
+      if (candy && candy.type === currentType) {
+        currentMatch.push(candy);
+      } else {
+        if (currentMatch.length >= 3) {
+          matches.push({
+            candies: [...currentMatch],
+            direction: 'vertical',
+          });
+        }
+        currentMatch = candy ? [candy] : [];
+        currentType = candy ? candy.type : '';
+      }
+    }
+    
+    if (currentMatch.length >= 3) {
+      matches.push({
+        candies: [...currentMatch],
+        direction: 'vertical',
+      });
+    }
+  }
+  
+  return matches;
 };
 
-// Refilling gaps
-export const dropCandies = (board, size = 8) => {
-  let newBoard = [...board];
-  for (let i = size*(size-1)-1; i >= 0; i--) {
-    if (newBoard[i + size] === "" && i + size < size*size) {
-      newBoard[i + size] = newBoard[i];
-      newBoard[i] = "";
-    }
-  }
-  // Fill empty spaces at top
-  for (let i = 0; i < size; i++) {
-    if (newBoard[i] === "") {
-      newBoard[i] = candyTypes[Math.floor(Math.random() * candyTypes.length)];
-    }
-  }
+export const removeMatches = (board, matches) => {
+  const newBoard = board.map(row => [...row]);
+  
+  matches.forEach(match => {
+    match.candies.forEach(candy => {
+      newBoard[candy.row][candy.col] = null;
+    });
+  });
+  
   return newBoard;
+};
+
+export const canSwap = (board, row1, col1, row2, col2) => {
+  // Check if positions are adjacent
+  const rowDiff = Math.abs(row1 - row2);
+  const colDiff = Math.abs(col1 - col2);
+  
+  if ((rowDiff === 1 && colDiff === 0) || (rowDiff === 0 && colDiff === 1)) {
+    // Simulate the swap
+    const tempBoard = board.map(row => [...row]);
+    const temp = tempBoard[row1][col1];
+    tempBoard[row1][col1] = tempBoard[row2][col2];
+    tempBoard[row2][col2] = temp;
+    
+    // Update positions
+    tempBoard[row1][col1].row = row1;
+    tempBoard[row1][col1].col = col1;
+    tempBoard[row2][col2].row = row2;
+    tempBoard[row2][col2].col = col2;
+    
+    // Check if this creates any matches
+    const matches = findMatches(tempBoard);
+    return matches.length > 0;
+  }
+  
+  return false;
 };
