@@ -1,14 +1,6 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 
 const LevelUp = ({ level, onContinue }) => {
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      onContinue();
-    }, 6000); // changed from 3000ms → 6000ms (6 seconds)
-
-    return () => clearTimeout(timer);
-  }, [onContinue]);
-
   return (
     <div className="modal-overlay">
       <div className="modal-content level-up">
@@ -18,6 +10,8 @@ const LevelUp = ({ level, onContinue }) => {
           <span className="level-text">Level {level}</span>
         </div>
         <p>Great job! Moving to the next challenge...</p>
+        
+        {/* ✅ Only button will control next level */}
         <button className="continue-button" onClick={onContinue}>
           Continue
         </button>
